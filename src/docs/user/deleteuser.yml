@@ -1,0 +1,29 @@
+Delete user details, deleting user details also deletes all companies, branches, messages and reviews created by and assossiated to user.
+---
+tags:
+  - User
+parameters:
+  - in: header
+    name: Authorization
+    required: true
+  - name: body
+    description: The body should contain the name of user you want to change
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "name"
+      properties:
+        name:
+          type: "full name"
+          example: "John Doe"
+responses:
+  200:
+    description: User details successfuly changed
+
+  400:
+    description: Fails to Edit details due to bad request data
+
+  404:
+    description: User not found
