@@ -212,6 +212,46 @@ def verify_password(email):
     }), HTTP_202_ACCEPTED
 
 
+@auth.post("/resendverify/<email>")
+@swag_from('./docs/auth/resendverify.yml')
+def resend_verify(email):
+
+    if not validators.email(email):
+        return jsonify({'error': "Email must be a valid email"}), HTTP_400_BAD_REQUEST
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({'error': "Email not found"}), HTTP_404_NOT_FOUND
+    
+    if user.verified == 1:
+        return jsonify({'error': "User already verified"}), HTTP_409_CONFLICT
+
+    code = generate_random_string(6)
+    purpose = "verifyemail"
+    expiration = 5
+    message = "Here is your email verification code: " + str(code) + ". This code expires in " + str(expiration) + " min."
+
+    code_hash = generate_password_hash(code)
+
+    old_verifications = Verification.query.filter_by(user_id = user.id, purpose=purpose)
+    for old_verification in old_verifications:
+        db.session.delete(old_verification)
+
+    verification = Verification(user_id=user.id, code=code_hash, purpose=purpose, expiration=expiration, created_at=datetime.now(), updated_at=datetime.now())
+
+    db.session.add(verification)
+    db.session.commit()
+
+    #Send email
+    msg = Message(subject='Verify Email', recipients=[email])
+    msg.body = message
+
+    mail.send(msg)
+
+    return jsonify({'msg': "Pls verify email"}), HTTP_200_OK
+
+
 @auth.get("/user")
 @jwt_required()
 @swag_from('./docs/user/user.yml')
