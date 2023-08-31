@@ -136,6 +136,7 @@ def login():
                 msg.body = message
 
                 mail.send(msg)
+
                 return jsonify({'msg': "Pls verify email"}), HTTP_200_OK
             
             refresh = create_refresh_token(identity=user.id)
@@ -163,7 +164,7 @@ def verify_password(email):
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'msg': "Email not found"}), HTTP_404_NOT_FOUND
+        return jsonify({'error': "Email not found"}), HTTP_404_NOT_FOUND
     
     code = request.json['code']
 
@@ -184,7 +185,7 @@ def verify_password(email):
     if  current_time - verification.created_at >= time_interval:
         db.session.delete(verification)
         db.session.commit()
-        return jsonify({'msg': "Token expired"}), HTTP_400_BAD_REQUEST
+        return jsonify({'error': "Token expired"}), HTTP_400_BAD_REQUEST
 
     user.verified = 1
 
