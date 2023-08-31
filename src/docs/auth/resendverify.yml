@@ -17,4 +17,4 @@ responses:
     description: User email invalid
 
   409:
-  description: User already verified
+    description: User already verified
