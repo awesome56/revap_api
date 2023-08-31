@@ -212,7 +212,7 @@ def verify_password(email):
     }), HTTP_202_ACCEPTED
 
 
-@auth.post("/resendverify/<email>")
+@auth.get("/resendverify/<email>")
 @swag_from('./docs/auth/resendverify.yml')
 def resend_verify(email):
 

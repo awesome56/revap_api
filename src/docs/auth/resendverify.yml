@@ -1,4 +1,4 @@
-Verify email
+Resend verification email
 ---
 tags:
   - Authentication
@@ -17,4 +17,4 @@ responses:
     description: User email invalid
 
   409:
-  description: User already verified
+    description: User already verified
