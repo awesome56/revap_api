@@ -283,7 +283,7 @@ def forgot_password(email):
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'msg': "Email not found"}), HTTP_404_NOT_FOUND
+        return jsonify({'error': "Email not found"}), HTTP_404_NOT_FOUND
     
     code = generate_random_string(6)
     purpose = "resetpassword"
