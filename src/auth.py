@@ -321,14 +321,14 @@ def reset_password(email):
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'msg': "Email not found"}), HTTP_404_NOT_FOUND
+        return jsonify({'error': "Email not found"}), HTTP_404_NOT_FOUND
     
     code = request.json['code']
     password = request.json['password']
     comfirm_password = request.json['comfirm_password']
 
     if not comfirm_password == password:
-        return jsonify({'msg': "Password missmatch"}), HTTP_400_BAD_REQUEST
+        return jsonify({'error': "Password missmatch"}), HTTP_400_BAD_REQUEST
 
     if not check_password(password):
         return jsonify({'error': "Password must contain an upper, a symbol, a number and must be more than 5 characters"}), HTTP_400_BAD_REQUEST
@@ -344,7 +344,7 @@ def reset_password(email):
         return jsonify({'error': "Token invalid"}), HTTP_400_BAD_REQUEST
     
     if check_password_hash(user.password, password):
-        return jsonify({'msg': "New password must be diffrent from Old password"}), HTTP_400_BAD_REQUEST
+        return jsonify({'error': "New password must be diffrent from Old password"}), HTTP_400_BAD_REQUEST
     
     time_interval = timedelta(minutes=verification.expiration)
 
@@ -353,7 +353,7 @@ def reset_password(email):
     if current_time - verification.created_at >= time_interval:
         db.session.delete(verification)
         db.session.commit()
-        return jsonify({'msg': "Token expired"}), HTTP_400_BAD_REQUEST
+        return jsonify({'error': "Token expired"}), HTTP_400_BAD_REQUEST
     
     pwd_hash = generate_password_hash(password)
 
