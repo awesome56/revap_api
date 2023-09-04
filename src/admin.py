@@ -66,6 +66,7 @@ def get_branches():
         data.append({
             'id': branch.id,
             'name': branch.name,
+            'description': branch.description,
             'email': branch.email,
             'phone': branch.phone,
             'website': branch.website,
@@ -175,6 +176,7 @@ def get_companies():
         data.append({
             'id': company.id,
             'name': company.name,
+            'category': company.category,
             'email': company.email,
             'website': company.website,
             'img': company.img,
