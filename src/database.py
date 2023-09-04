@@ -39,6 +39,7 @@ class Company(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False) 
     name = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), default="")
+    category = db.Column(db.String(255), nullable=True)
     website = db.Column(db.String(255), default="")
     img = db.Column(db.String(255), default="")
     ceo = db.Column(db.String(255), default="")
@@ -51,6 +52,15 @@ class Company(db.Model):
 
     def __repr__(self) -> str:
         return 'Company>>> {self.name}'
+    
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now())
+
+    def __repr__(self) -> str:
+        return 'Message>>> {self.name}'
     
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -80,6 +90,7 @@ class Branch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'), nullable=False) 
     name = db.Column(db.String(255), unique=True, nullable=False)
+    description = db.Column(db.String(255), default="")
     email = db.Column(db.String(255), default="")
     phone = db.Column(db.Integer, nullable=True)
     website = db.Column(db.String(255), default="")
