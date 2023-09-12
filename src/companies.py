@@ -26,6 +26,7 @@ def create_company():
     current_user = get_jwt_identity()
     name = request.get_json().get('name','')
     email = request.get_json().get('email','')
+    category = request.get_json().get('category','')
     website = request.get_json().get('website','')
     ceo = request.get_json().get('ceo','')
     head_office = request.get_json().get('head_office','')
@@ -37,15 +38,19 @@ def create_company():
         return jsonify({'error': "Email must be a valid email"}), HTTP_400_BAD_REQUEST
     
     if len(website) > 0:
-            adjusted_url = adjust_url(website)
-            if not adjusted_url:
-                return jsonify({'error': "Website must be a valid url"}), HTTP_400_BAD_REQUEST
+        adjusted_url = adjust_url(website)
+        if not adjusted_url:
+            return jsonify({'error': "Website must be a valid url"}), HTTP_400_BAD_REQUEST
+    
+    # Validate category
+    # if not check_category(category):
+    #         return jsonify({'error': "Category input invalid"}), HTTP_400_BAD_REQUEST
             
     
     if Company.query.filter_by(user_id=current_user, name=name).first():
         return jsonify({'error': "Company name already exists for user"}), HTTP_409_CONFLICT
     
-    company = Company(user_id=current_user, name=name, email=email, website=website, ceo=ceo, head_office=head_office, verified=0, created_at=datetime.now(), updated_at=datetime.now())
+    company = Company(user_id=current_user, name=name, email=email, category=category, website=website, ceo=ceo, head_office=head_office, verified=0, created_at=datetime.now(), updated_at=datetime.now())
     db.session.add(company)
     db.session.commit()
 
@@ -53,6 +58,7 @@ def create_company():
         'id': company.id,
         'name': company.name,
         'email': company.email,
+        'category': company.category,
         'website': company.website,
         'img': company.img,
         'ceo': company.ceo,
@@ -100,6 +106,7 @@ def get_companies():
 
     return jsonify({'data': data, 'meta':meta}), HTTP_200_OK
 
+# Add image to company
 @companies.route('/dp/<int:id>', methods=['POST'])
 @jwt_required()
 def dp_companies(id):
@@ -165,7 +172,7 @@ def allowed_file_size(file):
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     return len(file.read()) <= MAX_CONTENT_LENGTH
 
-
+#get simple company image
 @companies.get("/<int:id>")
 def get_company(id):
 
@@ -187,7 +194,7 @@ def get_company(id):
             'updated_at': company.updated_at,
         }), HTTP_200_OK
 
-
+#Edit companies
 @companies.put('/<int:id>')
 @companies.patch('/<int:id>')
 @jwt_required()
@@ -248,7 +255,7 @@ def edit_company(id):
         'updated_at': company.updated_at,
     }), HTTP_200_OK
 
-
+#Delete companies
 @companies.delete("/<int:id>")
 @jwt_required()
 def delete_company(id):

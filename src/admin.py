@@ -7,13 +7,14 @@ from src.constants.http_status_codes import HTTP_201_CREATED
 from src.constants.http_status_codes import HTTP_202_ACCEPTED
 from src.constants.http_status_codes import HTTP_204_NO_CONTENT
 from flask import Blueprint, request
-from src.database import User, Company, Branch, Message, Review, Verification, Mfile,File, db
+from src.database import User, Company, Branch, Message, Review, Verification, Mfile,File, Category, db
 from flask import Blueprint, request, jsonify
 import validators
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 import os
 import time
+from datetime import datetime
 
 admins = Blueprint("admin", __name__, url_prefix="/api/v1/admins")
 
@@ -304,3 +305,47 @@ def get_review_files():
     }
 
     return jsonify({'data': data, 'meta':meta}), HTTP_200_OK
+
+
+@admins.route('/category', methods=['POST'])
+# @jwt_required()
+def add_company_category():
+    # current_user = get_jwt_identity()
+    name = request.get_json().get('name','')
+
+    if not name:
+        return jsonify({'error': "Name must not be empty"}), HTTP_400_BAD_REQUEST 
+    
+    if Category.query.filter_by(name=name).first():
+        return jsonify({'error': "Category name already exists"}), HTTP_409_CONFLICT
+
+    category=Category(name=name, created_at=datetime.now(), updated_at=datetime.now())
+    db.session.add(category)
+    db.session.commit()
+
+    return jsonify({
+        'id': category.id,
+        'name': category.name,
+        'created_at': category.created_at,
+        'updated_at': category.updated_at,
+    }), HTTP_201_CREATED
+
+
+@admins.route('/category', methods=['GET'])
+# @jwt_required()
+def get_company_category():
+    # current_user = get_jwt_identity()
+
+    categories=File.query
+
+    data = []
+
+    for category in categories.items:
+        data.append({
+            'id': category.id,
+            'name': category.name,
+            'created_at': category.created_at,
+            'updated_at': category.updated_at
+        })
+
+    return jsonify({'data': data}), HTTP_200_OK
