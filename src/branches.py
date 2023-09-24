@@ -26,7 +26,7 @@ def add_branch(id):
     current_user = get_jwt_identity()
 
     if not Company.query.filter_by(id=id).first():
-        return jsonify({'message': "Item not found"}), HTTP_404_NOT_FOUND
+        return jsonify({'error': "Item not found"}), HTTP_404_NOT_FOUND
 
     if not Company.query.filter_by(id=id, user_id=current_user).first():
         return jsonify({'error': "Unauthorized user"}), HTTP_401_UNAUTHORIZED
@@ -110,7 +110,7 @@ def dp_branches(id):
 
     branch = Branch.query.filter_by(id=id).first()
     if not branch:
-        return jsonify({'message': "Branch not found"}),HTTP_404_NOT_FOUND
+        return jsonify({'error': "Branch not found"}),HTTP_404_NOT_FOUND
 
     company = Company.query.filter_by(id=branch.company_id, user_id=current_user).first()
 
@@ -178,7 +178,7 @@ def get_company_branch(id):
     branches=Branch.query.filter_by(company_id=id).paginate(page=page, per_page=per_page)
 
     if not branches:
-        return jsonify({'message': "Item not found"}),HTTP_404_NOT_FOUND
+        return jsonify({'error': "Item not found"}),HTTP_404_NOT_FOUND
 
     data = []
 
@@ -217,7 +217,7 @@ def get_branch(id):
     branch = Branch.query.filter_by(id=id).first()
 
     if not branch:
-        return jsonify({'message': "Item not found"}),HTTP_404_NOT_FOUND
+        return jsonify({'error': "Item not found"}),HTTP_404_NOT_FOUND
 
     return jsonify({
             'id': branch.id,
@@ -245,7 +245,7 @@ def edit_branch(id):
     branch = Branch.query.filter_by(id=id).first()
 
     if not branch:
-        return jsonify({'message': "Branch not found"}),HTTP_404_NOT_FOUND
+        return jsonify({'error': "Branch not found"}),HTTP_404_NOT_FOUND
 
     company = Company.query.filter_by(id=branch.company_id, user_id=current_user).first()
 
@@ -311,7 +311,7 @@ def delete_branch(id):
     branch = Branch.query.filter_by(id=id).first()
 
     if not branch:
-        return jsonify({'message': "Branch not found"}),HTTP_404_NOT_FOUND
+        return jsonify({'error': "Branch not found"}),HTTP_404_NOT_FOUND
 
     company = Company.query.filter_by(id=branch.company_id, user_id=current_user).first()
 
