@@ -18,6 +18,9 @@ import qrcode
 from src.constants.functions import adjust_url, generate_random_code
 from datetime import datetime
 
+# Add description
+# Add company_id
+
 branches = Blueprint("branch", __name__, url_prefix="/api/v1/branches")
 
 @branches.post("/company/<int:id>")
@@ -32,6 +35,7 @@ def add_branch(id):
         return jsonify({'error': "Unauthorized user"}), HTTP_401_UNAUTHORIZED
 
     name = request.get_json().get('name','')
+    description = request.get_json().get('description','')
     email = request.get_json().get('email','')
     phone = request.get_json().get('phone','')
     website = request.get_json().get('website','')
@@ -83,13 +87,15 @@ def add_branch(id):
 
     qr_img.save(img_path)
     
-    branch = Branch(company_id=id, name=name, email=email, phone=phone, website=website, img="", manager=manager, location=location, code=code, qrcode=img_path, created_at=datetime.now(), updated_at=datetime.now())
+    branch = Branch(company_id=id, name=name, description=description, email=email, phone=phone, website=website, img="", manager=manager, location=location, code=code, qrcode=img_path, created_at=datetime.now(), updated_at=datetime.now())
     db.session.add(branch)
     db.session.commit()
 
     return jsonify({
         'id': branch.id,
+        'company_id': branch.company_id,
         'name': branch.name,
+        'description': branch.description,
         'email': branch.email,
         'phone': branch.phone,
         'website': branch.website,
@@ -185,7 +191,9 @@ def get_company_branch(id):
     for branch in branches.items:
         data.append({
             'id': branch.id,
+            'company_id': branch.company_id,
             'name': branch.name,
+            'description': branch.description,
             'email': branch.email,
             'phone': branch.phone,
             'website': branch.website,
@@ -221,7 +229,9 @@ def get_branch(id):
 
     return jsonify({
             'id': branch.id,
+            'company_id': branch.company_id,
             'name': branch.name,
+            'description': branch.description,
             'email': branch.email,
             'phone': branch.phone,
             'website': branch.website,
@@ -253,6 +263,7 @@ def edit_branch(id):
         return jsonify({'error': "Unauthorized User"}),HTTP_401_UNAUTHORIZED
 
     name = request.get_json().get('name','')
+    description = request.get_json().get('description','')
     email = request.get_json().get('email','')
     phone = request.get_json().get('phone','')
     website = request.get_json().get('website','')
@@ -278,6 +289,7 @@ def edit_branch(id):
             return jsonify({'error': "Branch name already exists for company"}), HTTP_409_CONFLICT
 
     branch.name = name
+    branch.description = description
     branch.email = email
     branch.phone = phone
     branch.website = website
@@ -289,7 +301,9 @@ def edit_branch(id):
 
     return jsonify({
         'id': branch.id,
+        'company_id': branch.company_id,
         'name': branch.name,
+        'description': branch.description,
         'email': branch.email,
         'phone': branch.phone,
         'website': branch.website,
